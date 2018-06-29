@@ -10,7 +10,15 @@ class GamesController < ApplicationController
 
   # GET /games/1
   def show
-    render json: @game
+    game = @game.attributes
+
+    game[:frames] = game[:frames].map do |frame|
+      frame = frame.attributes.merge(JSON.parse(frame.value))
+      frame.delete('value')
+      frame
+    end
+
+    render json: game.as_json(include: :frames)
   end
 
   # POST /games
@@ -41,7 +49,7 @@ class GamesController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_game
-      @game = Game.find(params[:id])
+      @game = Game.includes(:frames).find(params[:id])
     end
 
     # Only allow a trusted parameter "white list" through.

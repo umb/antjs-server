@@ -7,7 +7,13 @@ class FramesController < ApplicationController
   def index
     @frames = Frame.all
 
-    render json: @frames
+    frames = @frames.map do |frame|
+      frame = frame.attributes.merge(JSON.parse(frame.value))
+      frame.delete('value')
+      frame
+    end
+
+    render json: frames
   end
 
   # GET /frames/1
