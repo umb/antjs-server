@@ -46,6 +46,6 @@ class CodeUploadsController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def code_upload_params
-      params.require(:code_upload).permit(:player_id, :code)
+      params.permit(:player_id, :code)
     end
 end
