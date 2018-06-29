@@ -10,15 +10,15 @@ class GamesController < ApplicationController
 
   # GET /games/1
   def show
-    game = @game.attributes
+    game = @game.as_json(include: :frames)
 
-    game[:frames] = game[:frames].map do |frame|
-      frame = frame.attributes.merge(JSON.parse(frame.value))
+    game[:frames] = game['frames'].map do |frame|
+      frame = frame.merge(JSON.parse(frame['value']))
       frame.delete('value')
       frame
     end
 
-    render json: game.as_json(include: :frames)
+    render json: game
   end
 
   # POST /games
