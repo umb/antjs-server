@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resources :frames
+
   resources :games do
     resources :frames
   end
