@@ -11,6 +11,7 @@ import { PlayerService } from './player.service';
 })
 export class AppComponent {
     public static playerIdStorageKey: string = 'playerId';
+    public static codeStorageKey: string = 'code';
     public code: Code = new Code();
     public desiredPlayerName: string;
     public player: Player;
@@ -18,6 +19,13 @@ export class AppComponent {
 
     constructor(private playerService: PlayerService, private codeUploadService: CodeUploadService) {
         this.loadPlayer();
+
+        const codeFromStorage = localStorage.getItem(AppComponent.codeStorageKey);
+
+        if (codeFromStorage) {
+            this.code = Object.assign(this.code, JSON.parse(codeFromStorage))
+        }
+
     }
 
     private loadPlayer(): void {
@@ -35,6 +43,7 @@ export class AppComponent {
 
     public uploadCode(): void {
         console.log(this.code.toModuleString());
+        localStorage.setItem(AppComponent.codeStorageKey, JSON.stringify(this.code));
         this.codeUploadService.uploadCode(this.code, this.player.id).subscribe(() => alert('uploaded'));
     }
 
@@ -49,6 +58,8 @@ export class AppComponent {
 
     public logout() {
         localStorage.removeItem(AppComponent.playerIdStorageKey);
+        localStorage.removeItem(AppComponent.codeStorageKey);
         this.player = null;
+        this.code = new Code();
     }
 }
