@@ -8,7 +8,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "postinstall": "npm prune && ng build --prod"
+    "postinstall": "npm prune && cd client && ng build --prod"
   },
   "private": true,
   "dependencies": {
