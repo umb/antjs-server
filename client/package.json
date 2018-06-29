@@ -8,7 +8,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "postinstall": "typings install && gulp check.versions && npm prune && ng build --prod"
+    "postinstall": "npm prune && ng build --prod"
   },
   "private": true,
   "dependencies": {
