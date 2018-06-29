@@ -1,4 +1,8 @@
 Rails.application.routes.draw do
+  resources :games do
+    resources :frames
+  end
+
   resources :code_uploads
   resources :players do
     resources :code_uploads
