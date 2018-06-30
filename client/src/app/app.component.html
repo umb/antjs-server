@@ -1,12 +1,13 @@
 <div class="content">
-    <div class="row" style="height: 5vh">
+    <div class="row header" style="height: 5vh">
         <div class="col-5">
-            logo
+            <img src="assets/logo.png" height="40" width="40"> <h1 style="display: inline-block; margin-left: 10px">antjs</h1>
         </div>
-        <div class="col-7 mt-2" style="text-align: right">
-            <span *ngIf="player">Playing as {{player.name}}</span>
-            <div class="btn btn-warning ml-3 mr-3" *ngIf="player" (click)="logout()">Logout</div>
-            <div class="btn btn-info mr-3" (click)="uploadCode()">Save Code</div>
+        <div class="col-7" style="text-align: right; margin-top: 5px;">
+            <span style="color: white" *ngIf="player">Playing as {{player.name}}</span>
+            <button class="btn btn-warning ml-3 mr-3" *ngIf="player" (click)="logout()">Logout</button>
+            <button class="btn btn-info mr-3" *ngIf="player" (click)="readyToPlay()" [disabled]="unsafedChanges || waitingForPlayers">{{readyToPlayBtnText}}</button>
+            <button class="btn btn-success mr-3" *ngIf="player" (click)="uploadCode()" [disabled]="!unsafedChanges">Save Code</button>
         </div>
     </div>
     <div class="row" style="height: 90vh">
@@ -23,7 +24,7 @@
                     <div *ngIf="codePart.parameters?.length">Input:
                         <span>{{codePart.parameters.join(", ")}}</span>
                     </div>
-                    <textarea [(ngModel)]="codePart.code"></textarea>
+                    <textarea [(ngModel)]="codePart.code" (ngModelChange)="onCodeChange()"></textarea>
                 </div>
             </div>
 
@@ -39,9 +40,9 @@
         </div>
     </div>
 
-    <div class="row" style="height: 5vh">
-        <div class="col-12">
-            footer
+    <div class="row footer" style="height: 5vh">
+        <div class="col-12 pt-3 pr-5">
+            Copyright 2018 Curo-Heros
         </div>
     </div>
 </div>

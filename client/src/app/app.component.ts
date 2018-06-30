@@ -3,6 +3,11 @@ import { CodeUploadService } from './code-upload.service';
 import { Code } from './code';
 import { Player } from './player';
 import { PlayerService } from './player.service';
+import { GameService } from './game.service';
+import { Observable } from 'rxjs/internal/Observable';
+import { interval } from 'rxjs/internal/observable/interval';
+import { catchError, flatMap, takeUntil } from 'rxjs/operators';
+import { Game } from './game';
 
 @Component({
     selector: 'app-root',
@@ -12,18 +17,25 @@ import { PlayerService } from './player.service';
 export class AppComponent {
     public static playerIdStorageKey: string = 'playerId';
     public static codeStorageKey: string = 'code';
+    public static readyToPlayText: string = 'Ready To Play';
+    public static waitingForPlayersText: string = 'WaitingForOtherPlayers';
     public code: Code = new Code();
     public desiredPlayerName: string;
     public player: Player;
     public loadingPlayerFinished: boolean;
+    public unsafedChanges: boolean;
+    public readyToPlayBtnText: string = AppComponent.readyToPlayText;
+    public waitingForPlayers: boolean;
+    private currentGameId: number;
+    public lastGame: Game;
 
-    constructor(private playerService: PlayerService, private codeUploadService: CodeUploadService) {
+    constructor(private playerService: PlayerService, private codeUploadService: CodeUploadService, private gameService: GameService) {
         this.loadPlayer();
 
         const codeFromStorage = localStorage.getItem(AppComponent.codeStorageKey);
 
         if (codeFromStorage) {
-            this.code = Object.assign(this.code, JSON.parse(codeFromStorage))
+            this.code = Object.assign(this.code, JSON.parse(codeFromStorage));
         }
 
     }
@@ -44,7 +56,7 @@ export class AppComponent {
     public uploadCode(): void {
         console.log(this.code.toModuleString());
         localStorage.setItem(AppComponent.codeStorageKey, JSON.stringify(this.code));
-        this.codeUploadService.uploadCode(this.code, this.player.id).subscribe(() => alert('uploaded'));
+        this.codeUploadService.uploadCode(this.code, this.player.id).subscribe(() => this.unsafedChanges = false);
     }
 
     public savePlayer() {
@@ -56,10 +68,39 @@ export class AppComponent {
         });
     }
 
+    public readyToPlay() {
+        this.readyToPlayBtnText = AppComponent.waitingForPlayersText;
+        this.waitingForPlayers = true;
+        this.startGame();
+    }
+
+    public onCodeChange() {
+        this.unsafedChanges = true;
+    }
+
+    public startGame() {
+        this.lastGame = null;
+
+        this.gameService.startGame({}).subscribe(game => {
+            this.currentGameId = game.id;
+
+            interval(5000).pipe(
+                takeUntil(Observable.create(this.lastGame && this.lastGame.frames)),
+                flatMap(s => this.gameService.loadGame(this.currentGameId))
+            ).subscribe(game => {
+                if (game.frames && game.frames.length) {
+                    this.lastGame = game;
+                }
+            });
+        });
+    }
+
     public logout() {
         localStorage.removeItem(AppComponent.playerIdStorageKey);
         localStorage.removeItem(AppComponent.codeStorageKey);
         this.player = null;
         this.code = new Code();
+        this.lastGame = null;
+        this.currentGameId = null;
     }
 }

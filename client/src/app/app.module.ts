@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { CodeUploadService } from './code-upload.service';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { PlayerService } from './player.service';
+import { GameService } from './game.service';
 
 @NgModule({
     declarations: [
@@ -18,7 +19,7 @@ import { PlayerService } from './player.service';
         CommonModule,
         HttpClientModule
     ],
-    providers: [CodeUploadService, HttpClient, PlayerService],
+    providers: [CodeUploadService, HttpClient, PlayerService, GameService],
     bootstrap: [AppComponent]
 })
 export class AppModule {
