@@ -4,8 +4,6 @@ import { Code } from './code';
 import { Player } from './player';
 import { PlayerService } from './player.service';
 import { GameService } from './game.service';
-import { Observable } from 'rxjs/internal/Observable';
-import { interval } from 'rxjs/internal/observable/interval';
 import { catchError, flatMap, takeUntil } from 'rxjs/operators';
 import { Game } from './game';
 
@@ -47,7 +45,7 @@ export class AppComponent {
             this.playerService.loadPlayer(playerId).subscribe((player) => {
                 this.player = player;
                 this.loadingPlayerFinished = true;
-            });
+            }, err => this.logout());
         } else {
             this.loadingPlayerFinished = true;
         }
@@ -84,10 +82,16 @@ export class AppComponent {
         this.gameService.startGame({}).subscribe(game => {
             this.currentGameId = game.id;
 
-            interval(5000).pipe(
-                takeUntil(Observable.create(this.lastGame && this.lastGame.frames)),
-                flatMap(s => this.gameService.loadGame(this.currentGameId))
-            ).subscribe(game => {
+            // interval(5000).pipe(
+            //     takeUntil(Observable.create(this.lastGame && this.lastGame.frames)),
+            //     flatMap(s => this.gameService.loadGame(this.currentGameId))
+            // ).subscribe(game => {
+            //     if (game.frames && game.frames.length) {
+            //         this.lastGame = game;
+            //     }
+            // });
+
+            this.gameService.loadGame(this.currentGameId).subscribe(game => {
                 if (game.frames && game.frames.length) {
                     this.lastGame = game;
                 }
