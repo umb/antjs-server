@@ -14,10 +14,16 @@ export class GameService {
     constructor(private http: HttpClient) {
     }
 
-    public startGame(game: Game) : Observable<Game>{
+    public createGame(game: Game) : Observable<Game>{
         const gameUrl = `${environment.serverURL}/games/`;
 
         return this.http.post<Game>(gameUrl, game);
+    }
+
+    public startGame(gameId, playerId) : Observable<Game>{
+        const gameUrl = `${environment.serverURL}/games/${gameId}/start?playerId=${playerId}`;
+
+        return this.http.put<Game>(gameUrl, {});
     }
 
     public loadGame(gameId: number) : Observable<Game>{

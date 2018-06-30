@@ -6,6 +6,8 @@ import { PlayerService } from './player.service';
 import { GameService } from './game.service';
 import { catchError, flatMap, takeUntil } from 'rxjs/operators';
 import { Game } from './game';
+import { interval } from 'rxjs/internal/observable/interval';
+import { Observable } from 'rxjs/internal/Observable';
 
 @Component({
     selector: 'app-root',
@@ -79,20 +81,22 @@ export class AppComponent {
     public startGame() {
         this.lastGame = null;
 
-        this.gameService.startGame({}).subscribe(game => {
+        this.gameService.createGame({}).subscribe(game => {
             this.currentGameId = game.id;
 
-            // interval(5000).pipe(
-            //     takeUntil(Observable.create(this.lastGame && this.lastGame.frames)),
-            //     flatMap(s => this.gameService.loadGame(this.currentGameId))
-            // ).subscribe(game => {
-            //     if (game.frames && game.frames.length) {
-            //         this.lastGame = game;
-            //     }
-            // });
+            this.gameService.startGame(this.currentGameId, this.player.id).subscribe(game => {
+                this.currentGameId = game.id;
 
-            this.gameService.loadGame(this.currentGameId).subscribe(game => {
-                if (game.frames && game.frames.length) {
+                if (!game.frames || !game.frames.length) {
+                    interval(5000).pipe(
+                        takeUntil(Observable.create(this.lastGame && this.lastGame.frames)),
+                        flatMap(s => this.gameService.loadGame(this.currentGameId))
+                    ).subscribe(game => {
+                        if (game.frames && game.frames.length) {
+                            this.lastGame = game;
+                        }
+                    });
+                } else {
                     this.lastGame = game;
                 }
             });

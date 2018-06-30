@@ -2,6 +2,7 @@ Rails.application.routes.draw do
   resources :frames
 
   resources :games do
+    put 'start', to: 'games#start', as: :start_game
     resources :frames
   end
 
